@@ -1,31 +1,61 @@
 const movieModel = require('../models/movieModel.js');
 const apiHelpers = require('../helpers/apiHelpers.js');
 
+const bodyParser = require('../index');
+
 //Return requests to the client
 module.exports = {
+
   getSearch: (req, res) => {
-    // get the search genre     
-
-    // https://www.themoviedb.org/account/signup
-    // get your API KEY
-
-    // use this endpoint to search for movies by genres, you will need an API key
-
-    // https://api.themoviedb.org/3/discover/movie
-
-    // and sort them by horrible votes using the search parameters in the API
+    var params = req.query.genreId;
+    apiHelpers.getMovieByName(params, (err, result) => {
+      if (err) {
+        res.sendStatus(404);
+      } else {
+        res.json(result.data);
+      }
+    });
   },
+
   getGenres: (req, res) => {
-    // make an axios request to get the list of official genres
-    
-    // use this endpoint, which will also require your API key: https://api.themoviedb.org/3/genre/movie/list
-    
-    // send back
+    apiHelpers.getMoviesByGenre((err, result) => {
+      if (err) {
+        res.sendStatus(404);
+      } else {
+        res.json(result.data);
+      }
+    })
   },
+
+  getAllMovies: (req, res) => {
+    movieModel.readAll((err, result) => {
+      if (err) {
+        res.sendStatus(404);
+      } else {
+        res.json(result);
+      }
+    })
+  },
+
   saveMovie: (req, res) => {
-
+    var params = [req.body.id, req.body.title, req.body.release_date, req.body.vote_average, req.body.poster_path];
+    movieModel.save(params, (err, result) => {
+      if (err) {
+        res.sendStatus(404);
+      } else {
+        res.sendStatus(201);
+      }
+    })
   },
-  deleteMovie: (req, res) => {
 
+  deleteMovie: (req, res) => {
+    var params = [req.body.id];
+    movieModel.delete(params, (err, result) => {
+      if (err) {
+        res.sendStatus(404);
+      } else {
+        res.sendStatus(200);
+      }
+    })
   }
 }
